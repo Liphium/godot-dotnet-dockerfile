@@ -1,8 +1,18 @@
-void dockerHubRegister(String version) {
+void dockerHubRegister(String version, String channel="stable") {
     script {
-        docker.withRegistry('', 'DOCKER_HUB_REGISTRY') {
-            docker.build("dunkelgrau/godot:${version}",
-                "--build-arg=\"GODOT_VERSION=${version}\" .").push()
+        if (channel=="stable")
+        {
+            docker.withRegistry('', 'DOCKER_HUB_REGISTRY') {
+                docker.build("dunkelgrau/godot:${version}",
+                    "--build-arg=\"GODOT_VERSION=${version}\" --build-arg=\"CHANNEL=${channel}\" .").push()
+            }
+        }
+        else
+        {
+            docker.withRegistry('', 'DOCKER_HUB_REGISTRY') {
+                docker.build("dunkelgrau/godot:${version}-${channel}",
+                    "--build-arg=\"GODOT_VERSION=${version}\" --build-arg=\"CHANNEL=${channel}\" .").push()
+            }
         }
     }
 }
