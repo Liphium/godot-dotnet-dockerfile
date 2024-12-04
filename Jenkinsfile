@@ -96,6 +96,11 @@ pipeline {
                         dockerHubRegister('4.3')
                     }
                 }
+                stage('Deploy 4.4-dev5') {
+                    steps {
+                        dockerHubRegister('4.4', 'dev5')
+                    }
+                }
             }
         }
     }
