@@ -155,4 +155,9 @@ ENV PATH="$PATH:/root/.local/bin/"
 
 **Q: Why does Godot throw `Parse Error: Identifier "..." not declared in the current scope.` in my CI/CD pipeline?**
 
-**A:** This typically happens if you are using a plugin, especially [GUT](https://github.com/bitwes/Gut). This PR should fix this issue: https://github.com/godotengine/godot/pull/92303
+**A:** This typically happens if you are using a plugin, especially [GUT](https://github.com/bitwes/Gut). This was fixed in version 4.3 by the [PR #923303]( https://github.com/godotengine/godot/pull/92303)
+
+**Q: Why does Godot hang in my CI/CD pipeline?**
+
+**A:** This is a known issue (see [issue #100122](https://github.com/godotengine/godot/issues/100122) or [issue #89767](https://github.com/godotengine/godot/issues/89767)).
+A workaround is to structure your project to have the blend files outside of your godot project folder and just have the glb files inside your godot project.
