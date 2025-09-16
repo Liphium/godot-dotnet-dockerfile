@@ -23,6 +23,7 @@ jobs:
           - "4.3"
           - "4.4"
           - "4.4.1"
+          - "4.5"
 
     steps:
       - name: Checkout code
