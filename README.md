@@ -3,8 +3,8 @@
 <center><img src="icons/godot_docker.png" alt="Godot Docker Image Logo" height="200"/></center>
 
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
-![Godot Engine](https://img.shields.io/badge/GODOT-%23FFFFFF.svg?style=for-the-badge&logo=godot-engine)
-![Jenkins](https://img.shields.io/badge/jenkins-%232C5263.svg?style=for-the-badge&logo=jenkins&logoColor=white)
+![Godot](https://img.shields.io/badge/godot-%23478CBF.svg?style=for-the-badge&logo=godot-engine&logoColor=white)
+![Forgejo Runner](https://img.shields.io/badge/Forgejo%20Runner-%23FF6F61?style=for-the-badge&logo=forgejo&logoColor=white)
 
 This docker image is designed to build, test and export your games on a CI/CD pipeline. It
 only contains the Godot engine with the tagged version.
