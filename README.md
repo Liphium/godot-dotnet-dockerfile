@@ -143,7 +143,7 @@ RUN pipx install "gdtoolkit==4.*"
 ENV PATH="$PATH:/root/.local/bin/"
 ```
 
-# FAQ
+# Q&A
 
 **Q: How can I run the editor?**
 
@@ -159,5 +159,11 @@ ENV PATH="$PATH:/root/.local/bin/"
 
 **Q: Why does Godot hang in my CI/CD pipeline?**
 
-**A:** This is a known issue (see [issue #100122](https://github.com/godotengine/godot/issues/100122) or [issue #89767](https://github.com/godotengine/godot/issues/89767)).
-A workaround is to structure your project to have the blend files outside of your godot project folder and just have the glb files inside your godot project.
+**A:** This is a known issue (see [issue #100122](https://github.com/godotengine/godot/issues/100122) or [issue #89767](https://github.com/godotengine/godot/issues/89767)). The infinite wait was due to an awaited interaction of blender, even if they were not used. It was solved in Godot 4.5.
+
+To use .blend files, the path to the Blender executable must be explicitly configured. Below is a sample Dockerfile snippet how to set the Blender path in a Godot 4.5.1 environment:
+```dockerfile
+FROM dunkelgrau/godot:4.5.1
+RUN apt install blender -y
+RUN sed -i '/filesystem\/import\/blender\/blender_path =/ s|= .*|= "/usr/bin/blender"|' ~/.config/godot/editor_settings-4.5.tres
+```
