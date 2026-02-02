@@ -1,31 +1,38 @@
-# Unofficial Godot Docker Image
+# Unofficial Godot .NET Docker Image
 
 <center><img src="icons/godot_docker.png" alt="Godot Docker Image Logo" height="200"/></center>
 
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![Godot](https://img.shields.io/badge/godot-%23478CBF.svg?style=for-the-badge&logo=godot-engine&logoColor=white)
-![Forgejo Runner](https://img.shields.io/badge/Forgejo%20Runner-%23FF6F61?style=for-the-badge&logo=forgejo&logoColor=white)
 
 This docker image is designed to build, test and export your games on a CI/CD pipeline. It
 only contains the Godot engine with the tagged version.
 
+## Changes made by us (to the fork)
+
+- Make the Dockerfile download Godot Mono and be based on an official .NET image
+- Download Mono build templates instead of normal ones
+
 ## Links
 
-* [Godot Engine](https://godotengine.org/)
-* [Docker Hub](https://hub.docker.com/r/dunkelgrau/godot)
-* [Github (Mirror)](https://github.com/graugraugrau/godot-dockerfile/)
+- [Godot Engine](https://godotengine.org/)
+- [Docker Hub](https://hub.docker.com/r/liphium/godot-mono)
+- [Github (Mirror)](https://github.com/liphium/godot-dotnet-dockerfile/)
 
 ## How to use
 
 To test the image locally you can run:
 
 ```bash
-docker container run dunkelgrau/godot:4.2.2 godot --version
+docker container run liphium/godot-mono:4.2.2 godot --version
 ```
 
 The following minimal examples demonstrate how to setup a basic pipeline for different automation servers. The example imports all assets, export a windows build and archives the result.
 
 The example assumes, that the Godot project file is on the root folder of your repository.
+
+> ![WARNING]
+> These usage examples have not been updated since I forked this repository. Please change them to reflect the actual name of the image.
 
 ### Github
 
@@ -123,6 +130,7 @@ pipeline {
 ## Extending the Docker Image
 
 Use this docker image as base to deploy your game at [itch.io](https://itch.io). For example:
+
 ```dockerfile
 FROM dunkelgrau/godot:4.2.2
 
@@ -135,6 +143,7 @@ RUN wget -O butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/
 ```
 
 Extend the docker image with [gdtoolkit](https://github.com/Scony/godot-gdscript-toolkit) to also lint and format your godot files.
+
 ```dockerfile
 FROM dunkelgrau/godot:4.2.2
 
@@ -155,13 +164,14 @@ ENV PATH="$PATH:/root/.local/bin/"
 
 **Q: Why does Godot throw `Parse Error: Identifier "..." not declared in the current scope.` in my CI/CD pipeline?**
 
-**A:** This typically happens if you are using a plugin, especially [GUT](https://github.com/bitwes/Gut). This was fixed in version 4.3 by the [PR #923303]( https://github.com/godotengine/godot/pull/92303)
+**A:** This typically happens if you are using a plugin, especially [GUT](https://github.com/bitwes/Gut). This was fixed in version 4.3 by the [PR #923303](https://github.com/godotengine/godot/pull/92303)
 
 **Q: Why does Godot hang in my CI/CD pipeline?**
 
 **A:** This is a known issue (see [issue #100122](https://github.com/godotengine/godot/issues/100122) or [issue #89767](https://github.com/godotengine/godot/issues/89767)). The infinite wait was due to an awaited interaction of blender, even if they were not used. It was solved in Godot 4.5.
 
 To use .blend files, the path to the Blender executable must be explicitly configured. Below is a sample Dockerfile snippet how to set the Blender path in a Godot 4.5.1 environment:
+
 ```dockerfile
 FROM dunkelgrau/godot:4.5.1
 RUN apt install blender -y
