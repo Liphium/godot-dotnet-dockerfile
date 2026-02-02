@@ -12,9 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	wget \
 	zip
 
-RUN wget -O godot.zip https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-${CHANNEL}/Godot_v${GODOT_VERSION}-${CHANNEL}_mono_linux_x86_64.zip
+RUN wget -O godot.zip https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-${CHANNEL}/Godot_v${GODOT_VERSION}-${CHANNEL}_mono_linux_x86_64.zip -q
 
-RUN wget -O godot-templates.tpz https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-${CHANNEL}/Godot_v${GODOT_VERSION}-${CHANNEL}_mono_export_templates.tpz;
+RUN wget -O godot-templates.tpz https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-${CHANNEL}/Godot_v${GODOT_VERSION}-${CHANNEL}_mono_export_templates.tpz -q;
 
 RUN mkdir -p ~/.config/godot
 RUN unzip godot.zip
