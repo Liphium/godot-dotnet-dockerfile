@@ -8,10 +8,15 @@
 This docker image is designed to build, test and export your games on a CI/CD pipeline. It
 only contains the Godot engine with the tagged version.
 
-## Changes made by us (to the fork)
+If you're looking for a Docker image that doesn't include the .NET version of Godot, you might want to check out [this repository](https://github.com/graugraugrau/godot-dockerfile).
+
+## Changes made by me (to the original repository)
 
 - Make the Dockerfile download Godot Mono and be based on an official .NET image
 - Download Mono build templates instead of normal ones
+- Change the Forgejo Runner to a GitHub Actions workflow
+- Only build versions of Godot .NET >= 4.4 (to decrease the amount of pipelines)
+- Change the README to include this section and new instructions for the .NET version of the image
 
 ## Links
 
@@ -24,7 +29,7 @@ only contains the Godot engine with the tagged version.
 To test the image locally you can run:
 
 ```bash
-docker container run liphium/godot-mono:4.2.2 godot --version
+docker container run liphium/godot-mono:4.4 godot --version
 ```
 
 The following minimal examples demonstrate how to setup a basic pipeline for different automation servers. The example imports all assets, export a windows build and archives the result.
@@ -32,7 +37,7 @@ The following minimal examples demonstrate how to setup a basic pipeline for dif
 The example assumes, that the Godot project file is on the root folder of your repository.
 
 > ![WARNING]
-> These usage examples have not been updated since I forked this repository. Please change them to reflect the actual name of the image.
+> Only the GitLab version of this has been tested since I forked this repository. Please open an issue in case there is any problem with the pipeline configurations below.
 
 ### Github
 
@@ -52,7 +57,7 @@ env:
 jobs:
   export_windows:
     runs-on: ubuntu-latest
-    container: dunkelgrau/godot:4.2.2
+    container: liphium/godot-mono:4.4
     steps:
       - name: Create symbolic link for export templates
         run: ln -s /root/.local /github/home/.local
@@ -77,7 +82,7 @@ jobs:
 Add `.gitlab-ci.yml` to your repository with the following content:
 
 ```yml
-image: dunkelgrau/godot:4.2.2
+image: liphium/godot-mono:4.4
 
 stages:
   - export
@@ -99,81 +104,31 @@ export:
       - build/windows
 ```
 
-### Jenkins
+## Q&A
 
-Add `Jenkinsfile` to your repository with the following content:
+### Can I use this for linting?
 
-```Groovy
-pipeline {
-    agent {
-         docker { image 'dunkelgrau/godot:4.2.2' }
-    }
+The normal `dotnet` CLI is also available in the base image. You could create a pipeline that runs the following command for example:
 
-    environment {
-        EXPORT_NAME = 'MyGodotGame'
-    }
-
-    stages {
-        stage('Export Windows') {
-            steps {
-                sh 'godot --headless --import'
-                sh "mkdir -p build/windows"
-                sh "godot --headless --export-release Windows\ Desktop build/windows/${EXPORT_NAME}.exe"
-                sh "cd build/windows && zip -r ../../build/${EXPORT_NAME}.zip ./* && cd -"
-                archiveArtifacts artifacts: "build/${EXPORT_NAME}.zip"
-            }
-        }
-    }
-}
+```sh
+dotnet format "<YOUR_SOLUTION_FILE>.sln" --verify-no-changes --verbosity diagnostic
 ```
 
-## Extending the Docker Image
+### How would I run a scene for testing purposes?
 
-Use this docker image as base to deploy your game at [itch.io](https://itch.io). For example:
+While of course the real editor is not supported, you can still run scenes just like you would in your editor, just without the rendering. This can be useful for testing purposes. Here's how you would do that:
 
-```dockerfile
-FROM dunkelgrau/godot:4.2.2
+```sh
+# Import the project
+godot --headless --import
 
-RUN wget -O butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default -q \
-    && unzip butler.zip \
-    && mv butler /usr/local/bin/butler \
-    && chmod +x /usr/local/bin/butler \
-    && rm butler.zip \
-    && /usr/local/bin/butler -V
+# Build the C# project (required for C# scripts to be executable)
+godot --headless --build-solutions --quit
+ 
+# Run the scene
+godot --headless -d Test.tscn --quit
 ```
 
-Extend the docker image with [gdtoolkit](https://github.com/Scony/godot-gdscript-toolkit) to also lint and format your godot files.
+### How can I run the editor?
 
-```dockerfile
-FROM dunkelgrau/godot:4.2.2
-
-RUN apt-get install -y --no-install-recommends pipx
-RUN pipx install "gdtoolkit==4.*"
-ENV PATH="$PATH:/root/.local/bin/"
-```
-
-# Q&A
-
-**Q: How can I run the editor?**
-
-**A:** The docker image is no replacement for the editor. In the docker container godot should always be executed with the argument `--headless`.
-
-**Q: Is there a C#/Mono Version?**
-
-**A:** Since I use mainly gdscript there is no C#/Mono version yet.
-
-**Q: Why does Godot throw `Parse Error: Identifier "..." not declared in the current scope.` in my CI/CD pipeline?**
-
-**A:** This typically happens if you are using a plugin, especially [GUT](https://github.com/bitwes/Gut). This was fixed in version 4.3 by the [PR #923303](https://github.com/godotengine/godot/pull/92303)
-
-**Q: Why does Godot hang in my CI/CD pipeline?**
-
-**A:** This is a known issue (see [issue #100122](https://github.com/godotengine/godot/issues/100122) or [issue #89767](https://github.com/godotengine/godot/issues/89767)). The infinite wait was due to an awaited interaction of blender, even if they were not used. It was solved in Godot 4.5.
-
-To use .blend files, the path to the Blender executable must be explicitly configured. Below is a sample Dockerfile snippet how to set the Blender path in a Godot 4.5.1 environment:
-
-```dockerfile
-FROM dunkelgrau/godot:4.5.1
-RUN apt install blender -y
-RUN sed -i '/filesystem\/import\/blender\/blender_path =/ s|= .*|= "/usr/bin/blender"|' ~/.config/godot/editor_settings-4.5.tres
-```
+The docker image is no replacement for the editor. In the docker container godot should always be executed with the argument `--headless`.
